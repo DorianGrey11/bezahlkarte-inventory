@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a> &rsaquo;
+    <a href="/logout"> Logout</a> &rsaquo;
+</div>{% endblock %}
+{% block content_title %}{% endblock %}
+{% block content %}
+<div style="padding: 2em; max-width: 600px;">
+    <h1 style="margin-bottom: 1em;">{% trans "Erfolgreich abgemeldet." %}</h1>
+
+    <p>
+        <a href="{% url 'login' %}" class="button"
+           style="text-decoration: none; padding: 0.5em 1em; color: white; border-radius: 4px;">
+            {% trans "Erneut anmelden" %}
+        </a>
+    </p>
+</div>
+
+{% endblock %}

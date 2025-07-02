@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a> &rsaquo;
+    {% if request.GET.collection %}
+    <a href="/"> {% for row in collections %}
+        {{ row.collection }}
+        {% endfor %}
+    </a> &rsaquo;
+    {% endif %}
+</div>
+{% endblock %}
+{% block content %}
+<h1>Übersicht</h1>
+
+<section style="margin-bottom: 2em;">
+    <h2>💰 Konto-/Kassenstände</h2>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+        <tr>
+            <th>Sammlung</th>
+            {% for account_name in account_headers %}
+            <th>{{ account_name }}</th>
+            {% endfor %}
+            <th>Aktion</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in collections %}
+        <tr>
+            <td><strong>{{ row.collection.name }}</strong></td>
+            {% for account_name, balance in row.balances %}
+            <td style="text-align: right;">
+                {% if balance is not None %}
+                {{ balance|floatformat:2 }} €
+                {% else %}
+                —
+                {% endif %}
+            </td>
+            {% endfor %}
+            <td>
+                <a href="{% url 'collection_balance' row.collection.id %}">⚙️ Bearbeiten</a> |
+                {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+                <a href="/">🔍 Alle Anzeigen</a>
+                {% else %}
+                <a href="?collection={{ row.collection.id }}">🔍 Anzeigen</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+    <form id="addCollectionForm" method="post" style="margin: 1em;">
+        {% csrf_token %}
+        <label for="add_collection_name">Neues Konto/Kasse hinzufügen:</label>
+        <input type="text" id="add_collection_name" name="add_collection_name" value="Kassenname">
+        <button type="submit" name="add_collection" value="1">hinzufügen</button>
+    </form>
+    {% endif %}
+
+</section>
+
+<section style="margin-bottom: 2em;">
+    <h2>Letzte Transaktionen</h2>
+    {% load render_table from django_tables2 %}
+    {% render_table transaction_table %}
+</section>
+{% endblock %}
