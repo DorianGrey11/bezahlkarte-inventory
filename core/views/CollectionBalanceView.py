@@ -58,9 +58,9 @@ class CollectionBalanceView(LoginRequiredMixin, View):
             with db_transaction.atomic():
                 accounts = Account.objects.filter(collection=collection)
                 external_accounts = Account.objects.exclude(collection=collection)
-                gift_card_accounts = accounts.filter(type='gift_card')
+                non_cash_accounts = accounts.exclude(type='cash')
                 cash_account = accounts.get(type='cash')
-                for acc in gift_card_accounts:
+                for acc in non_cash_accounts:
                     try:
                         desired_balance = float(request.POST.get(f"account_{acc.id}"))
                     except (TypeError, ValueError):
@@ -77,22 +77,7 @@ class CollectionBalanceView(LoginRequiredMixin, View):
                 if abs(balance_mismatch) > 0.01:
                     if request.POST.get('correction'):
                         correction_account = Account.objects.get(name="Fehlbetrag")
-                        Transaction.objects.create(
-                            account=cash_account,
-                            to=correction_account,
-                            amount=balance_mismatch,
-                            new_balance=desired_balance,
-                            user=request.user,
-                            description=request.POST.get(f"transaction_description")
-                        )
-                        Transaction.objects.create(
-                            account=correction_account,
-                            to=cash_account,
-                            amount=-balance_mismatch,
-                            new_balance=correction_account.balance - balance_mismatch,
-                            user=request.user,
-                            description=request.POST.get(f"transaction_description")
-                        )
+                        make_transaction(cash_account, correction_account, balance_mismatch, request.user,request.POST.get(f"transaction_description"))
                     else:
                         raise ValueError("Bilanz fehlerhaft.")
 
