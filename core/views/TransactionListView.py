@@ -5,13 +5,13 @@ from ..models import Transaction
 
 
 class TransactionTable(tables.Table):
-    account = tables.Column(verbose_name="Von")
+    account = tables.Column(verbose_name="Konto")
     amount = tables.Column(verbose_name="Betrag")
     to = tables.Column(verbose_name="An")
     new_balance = tables.Column(verbose_name="Neuer Kontostand")
-    user = tables.Column(verbose_name="Benutzer")
+    user = tables.Column(verbose_name="User")
     description = tables.Column(verbose_name="Beschreibung")
-    created_at = tables.Column(verbose_name="Zeitpunkt")
+    created_at = tables.Column(verbose_name="Zeitpunkt (UTC)")
 
     class Meta:
         model = Transaction
