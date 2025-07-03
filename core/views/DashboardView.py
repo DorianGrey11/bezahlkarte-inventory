@@ -28,12 +28,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         try:
             selected_collection_id = self.request.GET.get("collection")
             collections = [collections.get(id=selected_collection_id)]
-            account_names = list(Account.objects.filter(collection=selected_collection_id).values_list("name", flat=True).distinct())
+            account_names = list(
+                Account.objects.filter(collection=selected_collection_id).values_list("name", flat=True).distinct())
         except Collection.DoesNotExist:
             collections = collections
             account_names = list(Account.objects.order_by("type").reverse().values_list("name", flat=True).distinct())
 
         table = []
+        account_sums = [0 for _ in account_names]
         for collection in collections:
             accounts_in_collection = {acc.name: acc for acc in collection.accounts.all()}
             row = {
@@ -42,10 +44,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     (name, accounts_in_collection.get(name).balance if name in accounts_in_collection else None)
                     for name in account_names],
             }
+            for idx, balance in enumerate(row["balances"]):
+                if balance[1] is not None:
+                    account_sums[idx] += balance[1]
             table.append(row)
 
         context.update({
             'account_headers': account_names,
+            'account_sums': account_sums,
             'collections': table,
             'transaction_table': TransactionTable(Transaction.objects.filter(account__collection__in=collections))
         })
