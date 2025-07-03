@@ -32,9 +32,9 @@
             {% for account_name, balance in row.balances %}
             <td style="text-align: right;">
                 {% if balance is not None and balance != 0%}
-                {{ balance|floatformat:2 }} €
+                    {{ balance|floatformat:2 }} €
                 {% else %}
-                —
+                    —
                 {% endif %}
             </td>
             {% endfor %}
@@ -48,7 +48,7 @@
             </td>
         </tr>
         {% endfor %}
-        {% if request.GET.collection|stringformat:"s" %}
+        {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
         <tr>
             <td><strong>Summe</strong></td>
             {% for sum_value in account_sums %}
