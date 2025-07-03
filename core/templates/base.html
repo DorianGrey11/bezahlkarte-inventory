@@ -45,11 +45,11 @@
         <div id="user-tools">
             {% block welcome-msg %}
                 {% translate 'Willkommen,' %}
-                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                <strong>{% firstof user.get_short_name user.get_username %}</strong>.&nbsp;&nbsp;&nbsp;
             {% endblock %}
             {% block userlinks %}
-                {% if site_url %}
-                    <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+                {% if user.is_staff %}
+                    <a href="admin">{% translate 'Admin Seite' %}</a> /
                 {% endif %}
                 {% if user.is_active and user.is_staff %}
                     {% url 'django-admindocs-docroot' as docsroot %}
