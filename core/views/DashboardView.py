@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db import transaction
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,9 +13,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def post(self, request):
         if "add_collection" in request.POST:
-            Collection.objects.create(
-                name=request.POST.get(f"add_collection_name"),
-            )
+            with transaction.atomic():
+                collection = Collection.objects.create(
+                    name=request.POST.get(f"add_collection_name"),
+                )
+                Account.objects.create(collection=collection, name="Bargeld", type="cash")
             messages.success(request, "Neues Konto/Kasse hinzugefügt.")
             return redirect('dashboard')
 
