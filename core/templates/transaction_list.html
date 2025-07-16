@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/">Home</a>
+    &rsaquo;
+    <a href="/transactions/">
+        Transaktionen
+    </a>
+    {% if request.GET.collection %}
+    &rsaquo;
+    <a href="/transactions/?collection={{request.GET.collection}}">
+        {{request.GET.collection}}
+    </a>
+    {% endif %}
+    {% if request.GET.account %}
+    &rsaquo;
+    <a href="/transactions/?account={{request.GET.account}}">
+        {{request.GET.account}}
+    </a>
+    {% endif %}
+    {% if request.GET.description %}
+    &rsaquo;
+    <a href="/transactions/?description={{request.GET.description}}">
+        {{request.GET.description}}
+    </a>
+    {% endif %}
+    {% if request.GET.user %}
+    &rsaquo;
+    <a href="/transactions/?user={{request.GET.user}}">
+        {{request.GET.user}}
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+{% block content %}
+<h1>Transaktionen</h1>
+<form class="search-form">
+    <label for="collection_input">Kasse</label>
+    <input type="search" name="collection" id="collection_input" value="{{request.GET.collection}}">
+    <label for="account_input">Gutscheinart/Konto</label>
+    <input type="search" name="account" id="account_input" value="{{request.GET.account}}">
+    <label for="description_input">Beschreibung</label>
+    <input type="search" name="description" id="description_input" value="{{request.GET.description}}">
+    <label for="user_input">User</label>
+    <input type="search" name="user" id="user_input" value="{{request.GET.user}}">
+
+    <button type="submit">Anwenden</button>
+    <a class="button" href="/transactions/">Alle anzeigen</a>
+</form>
+<div>
+    {% render_table transactions %}
+</div>
+{% endblock %}

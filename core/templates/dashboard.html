@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="/">Home</a> &rsaquo;
+    <a href="/">Home</a>
     {% if request.GET.collection %}
-    <a href="/"> {% for row in collections %}
-        {{ row.collection }}
-        {% endfor %}
-    </a> &rsaquo;
+    &rsaquo;
+    <a href="/">
+        {% for row in rows %}{{ row.collection }}{% endfor %}
+    </a>
     {% endif %}
 </div>
 {% endblock %}
+
 {% block content %}
 <h1>Übersicht</h1>
 
-<section style="margin-bottom: 2em;">
+<section>
     <h2>💰 Konto-/Kassenstände</h2>
-    <table border="1" cellpadding="6" cellspacing="0">
+    <table class="table">
         <thead>
         <tr>
             <th>Sammlung</th>
@@ -26,58 +27,84 @@
         </tr>
         </thead>
         <tbody>
-        {% for row in collections %}
+        {% for row in rows %}
         <tr>
-            <td><strong>{{ row.collection.name }}</strong></td>
+            <th>{{ row.collection }}</th>
             {% for account_name, balance in row.balances %}
-            <td style="text-align: right;">
-                {% if balance is not None and balance != 0%}
-                    {{ balance|floatformat:2 }} €
+            <td>
+                {% if balance is not None and balance != 0 %}
+                {{ balance|floatformat:2 }} €
                 {% else %}
-                    —
+                —
                 {% endif %}
             </td>
             {% endfor %}
             <td>
-                <a href="{% url 'collection_balance' row.collection.id %}">⚙️ Bearbeiten</a> |
-                {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+                <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
+                <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                {% if request.GET.collection %}
                 <a href="/">🔍 Alle Anzeigen</a>
                 {% else %}
-                <a href="?collection={{ row.collection.id }}">🔍 Anzeigen</a>
+                <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
                 {% endif %}
             </td>
         </tr>
         {% endfor %}
+
         {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
-        <tr>
-            <td><strong>Summe</strong></td>
+        <tr class="highlighted-row">
+            <th>Summe</th>
             {% for sum_value in account_sums %}
-            <td style="text-align: right;"><strong>
+            <td>
                 {% if sum_value != 0 %}
-                    {{ sum_value|floatformat:2 }} €
+                {{ sum_value|floatformat:2 }} €
                 {% else %}
-                    —
-                {% endif %}</strong></td>
+                —
+                {% endif %}
+            </td>
             {% endfor %}
             <td>–</td>
         </tr>
         {% endif %}
         </tbody>
     </table>
-    {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
-    <form id="addCollectionForm" method="post" style="margin: 1em;">
-        {% csrf_token %}
-        <label for="add_collection_name">Neues Konto/Kasse hinzufügen:</label>
-        <input type="text" id="add_collection_name" name="add_collection_name" value="Kassenname">
-        <button type="submit" name="add_collection" value="1">hinzufügen</button>
-    </form>
-    {% endif %}
 
+    {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+    <button id="openModal">+ Neues Konto/Kasse</button>
+    <div id="collectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="addCollectionForm" method="post">
+                {% csrf_token %}
+                <label for="add_collection_name">Name des neuen Kontos/Kasse:</label>
+                <input type="text" id="add_collection_name" name="add_collection_name" value="Kassenname">
+                <button type="submit" name="add_collection" value="1">Hinzufügen</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 </section>
 
-<section style="margin-bottom: 2em;">
+<section>
     <h2>Letzte Transaktionen</h2>
     {% load render_table from django_tables2 %}
-    {% render_table transaction_table %}
+    <div>
+        {% render_table transaction_table %}
+    </div>
+    <br/><br/>
+    <a href="/transactions/{% if request.GET.collection %}?collection={% for row in rows %}{{ row.collection.name }}{% endfor %}{% endif %}"
+       class="button">Alle Transaktionen</a>
 </section>
+
+<script>
+    const modal = document.getElementById("collectionModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.querySelector(".modal .close");
+
+    openBtn.addEventListener("click", () => modal.style.display = "block");
+    closeBtn.addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) modal.style.display = "none";
+    });
+</script>
 {% endblock %}

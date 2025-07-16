@@ -1,0 +1,151 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+}
+
+/* HEADER */
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    color: #010;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #010;
+    margin-bottom: 1em;
+}
+
+/* Table */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+    bottom: 2em;
+}
+
+.table th {
+    font-weight: bold;
+}
+
+.table thead th {
+    background-color: #f8f8f8;
+    border-bottom: 2px solid #ccc;
+}
+
+.table th,
+.table td {
+    padding: 0.75em;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.table .highlighted-row {
+    background-color: #afa;
+    font-weight: bold;
+}
+
+/* Button */
+
+button,
+a.button {
+    padding: 0.5em 1em;
+    margin: 1em;
+    background-color: #417690;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover,
+a.button:hover{
+    background: var(--button-hover-bg)
+}
+
+.add-gift-card-button {
+    padding: 0.4em;
+    margin: 0;
+}
+
+/* Modal */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 2em;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 6px;
+}
+
+.modal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal .close:hover,
+.modal .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.alert {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid red;
+    background-color: #fbeaea;
+}
+
+/* Search Form */
+
+.search-form {
+    background-color: #fff;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 6px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+    gap: 1em 2em;
+    align-items: end;
+}
+
+.search-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.search-form input {
+    width: 100%;
+    padding: 0.3em;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-form a {
+    width: 50%;
+    text-align: center;
+ }
+

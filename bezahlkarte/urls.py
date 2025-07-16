@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from core.views import CollectionBalanceView, DashboardView
+from core.views import CollectionBalanceView, DashboardView, TransferView, TransactionListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("django.contrib.auth.urls")),
     path('', DashboardView.as_view(), name='dashboard'),
-    path('collections/<int:collection_id>', CollectionBalanceView.as_view(), name='collection_balance'),
+    path('collections/<int:collection_id>/edit/', CollectionBalanceView.as_view(), name='collection_balance'),
+    path('collections/<int:collection_id>/transfer/', TransferView.as_view(), name='transfer'),
+    path('transactions/', TransactionListView.as_view(), name='transaction_list'),
 ]

@@ -7,19 +7,22 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .TransactionListView import TransactionTable
 from ..models import Collection, Transaction, Account
 
+NUMBER_OF_TRANSACTIONS_LISTED = 12
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard.html'
 
     def post(self, request):
-        if "add_collection" in request.POST:
+        try:
             with transaction.atomic():
                 collection = Collection.objects.create(
                     name=request.POST.get(f"add_collection_name"),
                 )
                 Account.objects.create(collection=collection, name="Bargeld", type="cash")
             messages.success(request, "Neues Konto/Kasse hinzugefügt.")
-            return redirect('dashboard')
+        except Exception as e:
+            messages.error(request, e)
+        return redirect('dashboard')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +37,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             collections = collections
             account_names = list(Account.objects.order_by("type").reverse().values_list("name", flat=True).distinct())
 
-        table = []
+        rows = []
         account_sums = [0 for _ in account_names]
         for collection in collections:
             accounts_in_collection = {acc.name: acc for acc in collection.accounts.all()}
@@ -47,12 +50,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             for idx, balance in enumerate(row["balances"]):
                 if balance[1] is not None:
                     account_sums[idx] += balance[1]
-            table.append(row)
+            rows.append(row)
 
         context.update({
             'account_headers': account_names,
             'account_sums': account_sums,
-            'collections': table,
-            'transaction_table': TransactionTable(Transaction.objects.filter(account__collection__in=collections))
+            'rows': rows,
+            'transaction_table': TransactionTable(
+                Transaction
+                .objects
+                .filter(account__collection__in=collections)
+                .order_by("-created_at")[:NUMBER_OF_TRANSACTIONS_LISTED:1],
+                order_by=self.request.GET.get("sort")),
         })
         return context
