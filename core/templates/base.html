@@ -50,7 +50,7 @@
             {% endblock %}
             {% block userlinks %}
                 {% if user.is_staff %}
-                    <a href="admin">{% translate 'Admin Seite' %}</a> /
+                    <a href="/admin">{% translate 'Admin Seite' %}</a> /
                 {% endif %}
                 {% if user.is_active and user.is_staff %}
                     {% url 'django-admindocs-docroot' as docsroot %}
