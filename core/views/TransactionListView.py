@@ -24,10 +24,10 @@ class TransactionListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         filter_kwargs = {filter_query: filter_value for filter_query, filter_value in
-                         [("account__collection__name__contains", self.request.GET.get("collection")),
-                          ("account__name__contains", self.request.GET.get("account")),
-                          ("description__contains", self.request.GET.get("description")),
-                          ("user__username__contains", self.request.GET.get("user")),
+                         [("account__collection__name__icontains", self.request.GET.get("collection")),
+                          ("account__name__icontains", self.request.GET.get("account")),
+                          ("description__icontains", self.request.GET.get("description")),
+                          ("user__username__icontains", self.request.GET.get("user")),
                           ]
                          if filter_value is not None
                          }
