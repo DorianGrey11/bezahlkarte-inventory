@@ -28,7 +28,7 @@ class CollectionBalanceView(LoginRequiredMixin, View):
             # Create new gift_card account
             Account.objects.create(
                 collection=collection,
-                name=request.POST.get(f"add_account_name").strip().toLower(),
+                name=request.POST.get(f"add_account_name").strip().lower(),
                 type="gift_card",
             )
             messages.success(request, "Neue Gutscheinart wurde hinzugefügt.")
