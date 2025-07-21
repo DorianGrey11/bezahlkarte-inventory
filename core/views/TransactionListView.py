@@ -1,8 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django_tables2 import tables
+from guardian.shortcuts import get_objects_for_user
 
-from ..models import Transaction
+from ..models import Transaction, Collection
 
 
 class TransactionTable(tables.Table):
@@ -23,8 +24,14 @@ class TransactionListView(LoginRequiredMixin, TemplateView):
     template_name = "transaction_list.html"
 
     def get_context_data(self, **kwargs):
+        allowed_collections = get_objects_for_user(
+            self.request.user,
+            'core.view_collection',
+            klass=Collection
+        )
         filter_kwargs = {filter_query: filter_value for filter_query, filter_value in
-                         [("account__collection__name__icontains", self.request.GET.get("collection")),
+                         [("account__collection__in", allowed_collections),
+                          ("account__collection__name__icontains", self.request.GET.get("collection")),
                           ("account__name__icontains", self.request.GET.get("account")),
                           ("description__icontains", self.request.GET.get("description")),
                           ("user__username__icontains", self.request.GET.get("user")),

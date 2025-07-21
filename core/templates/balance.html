@@ -21,9 +21,11 @@
             <th>{{ account.name }}</th>
             {% endfor %}
             <th>
+                {% if perms.core.add_account %}
                 <button type="button" onclick="openModal('giftCardModal')" class="add-gift-card-button">
                     ➕ Neue Gutscheinart hinzufügen
                 </button>
+                {% endif %}
             </th>
         </tr>
         </thead>

@@ -1,9 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.utils.timezone import now
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction as db_transaction
 from django.contrib import messages
+from guardian.shortcuts import get_objects_for_user
 
 from core.models import Account, Collection
 from core.views.utils import make_transaction
@@ -11,8 +13,15 @@ from core.views.utils import make_transaction
 
 class TransferView(LoginRequiredMixin, View):
     def get(self, request, collection_id):
-        collection = get_object_or_404(Collection, id=collection_id)
-        accounts = Account.objects.filter(collection=collection)
+        try:
+            collection = get_objects_for_user(
+                request.user,
+                'core.change_collection',
+                klass=Collection.objects.prefetch_related('accounts')
+            ).get(id=collection_id)
+        except Collection.DoesNotExist:
+            raise Http404
+        accounts = collection.accounts.all()
         external_accounts = Account.objects.exclude(collection=collection)
 
         return render(request, 'transfer.html', {
@@ -23,10 +32,18 @@ class TransferView(LoginRequiredMixin, View):
         })
 
     def post(self, request, collection_id):
-        collection = get_object_or_404(Collection, id=collection_id)
+        try:
+            collection = get_objects_for_user(
+                request.user,
+                'core.change_collection',
+                klass=Collection.objects.prefetch_related('accounts')
+            ).get(id=collection_id)
+        except Collection.DoesNotExist:
+            raise Http404
+
         try:
             with db_transaction.atomic():
-                accounts = Account.objects.filter(collection=collection)
+                accounts = collection.accounts.all()
                 external_accounts = Account.objects.exclude(collection=collection)
                 external_accounts_dict = {str(acc.id): acc for acc in external_accounts}
                 for acc in accounts:

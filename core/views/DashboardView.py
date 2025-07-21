@@ -1,8 +1,10 @@
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from guardian.shortcuts import get_objects_for_user
 
 from .TransactionListView import TransactionTable
 from ..models import Collection, Transaction, Account
@@ -14,6 +16,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def post(self, request):
         try:
+            if not self.request.user.has_perm('core.add_collection'):
+                raise PermissionDenied("Keine Berechtigung eine neues Konto/Kasse zu erstellen.")
             with transaction.atomic():
                 collection = Collection.objects.create(
                     name=request.POST.get(f"add_collection_name"),
@@ -26,8 +30,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        collections = Collection.objects.prefetch_related('accounts').order_by('name')
+        collections = get_objects_for_user(
+                self.request.user,
+                'core.view_collection',
+                klass=Collection.objects.prefetch_related('accounts')
+            ).order_by('name')
         try:
             selected_collection_id = self.request.GET.get("collection")
             collections = [collections.get(id=selected_collection_id)]

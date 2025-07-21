@@ -40,8 +40,10 @@
             </td>
             {% endfor %}
             <td>
+                {% if perms.core.change_collection %}
                 <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
                 <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                {% endif %}
                 {% if request.GET.collection %}
                 <a href="/">🔍 Alle Anzeigen</a>
                 {% else %}
@@ -51,7 +53,7 @@
         </tr>
         {% endfor %}
 
-        {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+        {% if not request.GET.collection %}
         <tr class="highlighted-row">
             <th>Summe</th>
             {% for sum_value in account_sums %}
@@ -69,7 +71,7 @@
         </tbody>
     </table>
 
-    {% if request.GET.collection|stringformat:"s" == row.collection.id|stringformat:"s" %}
+    {% if request.GET.collection and perms.core.add_collection %}
     <button id="openModal">+ Neues Konto/Kasse</button>
     <div id="collectionModal" class="modal">
         <div class="modal-content">
