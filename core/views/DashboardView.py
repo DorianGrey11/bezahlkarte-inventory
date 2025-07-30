@@ -10,6 +10,8 @@ from .TransactionListView import TransactionTable
 from ..models import Collection, Transaction, Account
 
 NUMBER_OF_TRANSACTIONS_LISTED = 12
+STANDARD_GIFT_CARDS = ["aldi", "dm", "kaufland", "lidl", "rewe"]
+
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard.html'
@@ -23,6 +25,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     name=request.POST.get(f"add_collection_name"),
                 )
                 Account.objects.create(collection=collection, name="Bargeld", type="cash")
+                if request.POST.get(f"add_collection_standard_gift_cards"):
+                    for name in STANDARD_GIFT_CARDS:
+                        Account.objects.create(collection=collection, name=name, type="gift_card")
+
             messages.success(request, "Neues Konto/Kasse hinzugefügt.")
         except Exception as e:
             messages.error(request, e)
@@ -31,10 +37,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         collections = get_objects_for_user(
-                self.request.user,
-                'core.view_collection',
-                klass=Collection.objects.prefetch_related('accounts')
-            ).order_by('name')
+            self.request.user,
+            'core.view_collection',
+            klass=Collection.objects.prefetch_related('accounts')
+        ).order_by('name')
         try:
             selected_collection_id = self.request.GET.get("collection")
             collections = [collections.get(id=selected_collection_id)]

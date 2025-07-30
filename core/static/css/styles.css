@@ -109,6 +109,16 @@ a.button:hover{
     cursor: pointer;
 }
 
+.modal div {
+    margin-bottom: 1em;
+}
+
+.modal button {
+    margin-left: 0;
+    margin-top: 1.5em;
+    width: 90%;
+}
+
 .alert {
     margin: 1em 0;
     padding: 1em;

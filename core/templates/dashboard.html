@@ -1,112 +1,119 @@
 {% extends "base.html" %}
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="/">Home</a>
-    {% if request.GET.collection %}
-    &rsaquo;
-    <a href="/">
-        {% for row in rows %}{{ row.collection }}{% endfor %}
-    </a>
-    {% endif %}
-</div>
+    <div class="breadcrumbs">
+        <a href="/">Home</a>
+        {% if request.GET.collection %}
+            &rsaquo;
+            <a href="/">
+                {% for row in rows %}{{ row.collection }}{% endfor %}
+            </a>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block content %}
-<h1>Übersicht</h1>
+    <h1>Übersicht</h1>
 
-<section>
-    <h2>💰 Konto-/Kassenstände</h2>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Sammlung</th>
-            {% for account_name in account_headers %}
-            <th>{{ account_name }}</th>
+    <section>
+        <h2>💰 Konto-/Kassenstände</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Sammlung</th>
+                {% for account_name in account_headers %}
+                    <th>{{ account_name }}</th>
+                {% endfor %}
+                <th>Aktion</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+                <tr>
+                    <th>{{ row.collection }}</th>
+                    {% for account_name, balance in row.balances %}
+                        <td>
+                            {% if balance is not None and balance != 0 %}
+                                {{ balance|floatformat:2 }} €
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td>
+                        {% if perms.core.change_collection %}
+                            <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
+                            <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                        {% endif %}
+                        {% if request.GET.collection %}
+                            <a href="/">🔍 Alle Anzeigen</a>
+                        {% else %}
+                            <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
-            <th>Aktion</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in rows %}
-        <tr>
-            <th>{{ row.collection }}</th>
-            {% for account_name, balance in row.balances %}
-            <td>
-                {% if balance is not None and balance != 0 %}
-                {{ balance|floatformat:2 }} €
-                {% else %}
-                —
-                {% endif %}
-            </td>
-            {% endfor %}
-            <td>
-                {% if perms.core.change_collection %}
-                <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
-                <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
-                {% endif %}
-                {% if request.GET.collection %}
-                <a href="/">🔍 Alle Anzeigen</a>
-                {% else %}
-                <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
 
-        {% if not request.GET.collection %}
-        <tr class="highlighted-row">
-            <th>Summe</th>
-            {% for sum_value in account_sums %}
-            <td>
-                {% if sum_value != 0 %}
-                {{ sum_value|floatformat:2 }} €
-                {% else %}
-                —
-                {% endif %}
-            </td>
-            {% endfor %}
-            <td>–</td>
-        </tr>
+            {% if not request.GET.collection %}
+                <tr class="highlighted-row">
+                    <th>Summe</th>
+                    {% for sum_value in account_sums %}
+                        <td>
+                            {% if sum_value != 0 %}
+                                {{ sum_value|floatformat:2 }} €
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td>–</td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+        {% if not request.GET.collection and perms.core.add_collection %}
+            <button id="openModal">+ Neues Konto/Kasse</button>
+            <div id="collectionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <form id="addCollectionForm" method="post">
+                        {% csrf_token %}
+                        <div>
+                            <label for="add_collection_name">Name des neuen Kontos/Kasse:</label>
+                            <input type="text" id="add_collection_name" name="add_collection_name" value="Kassenname">
+                        </div>
+                        <div>
+                            <label for="add_collection_standard_gift_cards">Standard Gutscheinearten benutzen:</label>
+                            <input type="checkbox" id="add_collection_standard_gift_cards"
+                                   name="add_collection_standard_gift_cards" checked>
+                        </div>
+                        <button type="submit" name="add_collection" value="1">Hinzufügen</button>
+                    </form>
+                </div>
+            </div>
         {% endif %}
-        </tbody>
-    </table>
+    </section>
 
-    {% if not request.GET.collection and perms.core.add_collection %}
-    <button id="openModal">+ Neues Konto/Kasse</button>
-    <div id="collectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <form id="addCollectionForm" method="post">
-                {% csrf_token %}
-                <label for="add_collection_name">Name des neuen Kontos/Kasse:</label>
-                <input type="text" id="add_collection_name" name="add_collection_name" value="Kassenname">
-                <button type="submit" name="add_collection" value="1">Hinzufügen</button>
-            </form>
+    <section>
+        <h2>Letzte Transaktionen</h2>
+        {% load render_table from django_tables2 %}
+        <div>
+            {% render_table transaction_table %}
         </div>
-    </div>
-    {% endif %}
-</section>
+        <br/><br/>
+        <a href="/transactions/{% if request.GET.collection %}?collection={% for row in rows %}{{ row.collection.name }}{% endfor %}{% endif %}"
+           class="button">Alle Transaktionen</a>
+    </section>
 
-<section>
-    <h2>Letzte Transaktionen</h2>
-    {% load render_table from django_tables2 %}
-    <div>
-        {% render_table transaction_table %}
-    </div>
-    <br/><br/>
-    <a href="/transactions/{% if request.GET.collection %}?collection={% for row in rows %}{{ row.collection.name }}{% endfor %}{% endif %}"
-       class="button">Alle Transaktionen</a>
-</section>
+    <script>
+        const modal = document.getElementById("collectionModal");
+        const openBtn = document.getElementById("openModal");
+        const closeBtn = document.querySelector(".modal .close");
 
-<script>
-    const modal = document.getElementById("collectionModal");
-    const openBtn = document.getElementById("openModal");
-    const closeBtn = document.querySelector(".modal .close");
-
-    openBtn.addEventListener("click", () => modal.style.display = "block");
-    closeBtn.addEventListener("click", () => modal.style.display = "none");
-    window.addEventListener("click", (e) => {
-        if (e.target === modal) modal.style.display = "none";
-    });
-</script>
+        openBtn.addEventListener("click", () => modal.style.display = "block");
+        closeBtn.addEventListener("click", () => modal.style.display = "none");
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) modal.style.display = "none";
+        });
+    </script>
 {% endblock %}
