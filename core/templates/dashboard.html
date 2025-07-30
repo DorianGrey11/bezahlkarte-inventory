@@ -71,7 +71,7 @@
         </tbody>
     </table>
 
-    {% if request.GET.collection and perms.core.add_collection %}
+    {% if not request.GET.collection and perms.core.add_collection %}
     <button id="openModal">+ Neues Konto/Kasse</button>
     <div id="collectionModal" class="modal">
         <div class="modal-content">
