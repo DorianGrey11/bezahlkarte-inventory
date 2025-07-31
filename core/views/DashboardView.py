@@ -57,8 +57,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             row = {
                 'collection': collection,
                 'balances': [
-                    (name, accounts_in_collection.get(name).balance if name in accounts_in_collection else None)
-                    for name in account_names],
+                    (name,
+                     accounts_in_collection.get(name).balance if name in accounts_in_collection else None,
+                     accounts_in_collection.get(name).number_of_gift_cards if name in accounts_in_collection else None
+                     )
+                    for name in account_names
+                ],
             }
             for idx, balance in enumerate(row["balances"]):
                 if balance[1] is not None:

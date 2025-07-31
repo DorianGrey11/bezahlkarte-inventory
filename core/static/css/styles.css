@@ -20,6 +20,12 @@ h2 {
 
 /* Table */
 
+.scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    background-color: #fff;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -34,13 +40,17 @@ h2 {
 
 .table thead th {
     background-color: #f8f8f8;
-    border-bottom: 2px solid #ccc;
+    border-bottom: double;
 }
 
 .table th,
 .table td {
     padding: 0.75em;
     border-bottom: 1px solid #e8e8e8;
+}
+
+.table .bottom-line {
+    border-bottom: double;
 }
 
 .table .highlighted-row {
@@ -60,8 +70,9 @@ a.button {
     border-radius: 4px;
     cursor: pointer;
 }
+
 button:hover,
-a.button:hover{
+a.button:hover {
     background: var(--button-hover-bg)
 }
 
@@ -157,5 +168,5 @@ a.button:hover{
 .search-form a {
     width: 50%;
     text-align: center;
- }
+}
 

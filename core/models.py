@@ -35,6 +35,12 @@ class Account(models.Model):
         latest_transaction = self.transactions.order_by('-created_at').first()
         return latest_transaction.new_balance if latest_transaction else 0.0
 
+    @property
+    def number_of_gift_cards(self):
+        """Returns the most recent new_number_of_gift_cards recorded for this account"""
+        latest_transaction = self.transactions.order_by('-created_at').first()
+        return latest_transaction.new_number_of_gift_cards if latest_transaction else 0
+
     def transfer(self, amount, to_account, description='', now=datetime.now(timezone.utc)):
         """
         Create a transaction transferring `amount` from this account to `to_account`.
@@ -68,8 +74,10 @@ class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING, related_name='transactions')
     to = models.ForeignKey(Account, on_delete=models.DO_NOTHING, related_name='incoming_transactions')
     amount = models.FloatField()
+    number_of_gift_cards = models.IntegerField()
     description = models.TextField(blank=True)
     new_balance = models.FloatField()
+    new_number_of_gift_cards = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -16,60 +16,65 @@
 
     <section>
         <h2>💰 Konto-/Kassenstände</h2>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Sammlung</th>
-                {% for account_name in account_headers %}
-                    <th>{{ account_name }}</th>
-                {% endfor %}
-                <th>Aktion</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for row in rows %}
+        <div class="scroll-container">
+            <table class="table">
+                <thead>
                 <tr>
-                    <th>{{ row.collection }}</th>
-                    {% for account_name, balance in row.balances %}
+                    <th>Sammlung</th>
+                    {% for account_name in account_headers %}
+                        <th>{{ account_name }}</th>
+                    {% endfor %}
+                    <th>Aktion</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <th>{{ row.collection }}</th>
+                        {% for account_name, balance, number_of_gift_cards in row.balances %}
+                            <td>
+                                {% if balance is not None and balance != 0 %}
+                                    {{ balance|floatformat:0 }} €
+                                    {% if number_of_gift_cards is not None and number_of_gift_cards != 0 %}
+                                        ({{ number_of_gift_cards }} St.)
+                                    {% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        {% endfor %}
                         <td>
-                            {% if balance is not None and balance != 0 %}
-                                {{ balance|floatformat:2 }} €
+                            {% if perms.core.change_collection %}
+                                <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
+                                <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                            {% endif %}
+                            {% if request.GET.collection %}
+                                <a href="/">🔍 Alle Anzeigen</a>
                             {% else %}
-                                —
+                                <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
                             {% endif %}
                         </td>
-                    {% endfor %}
-                    <td>
-                        {% if perms.core.change_collection %}
-                            <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
-                            <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
-                        {% endif %}
-                        {% if request.GET.collection %}
-                            <a href="/">🔍 Alle Anzeigen</a>
-                        {% else %}
-                            <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
+                    </tr>
+                {% endfor %}
 
-            {% if not request.GET.collection %}
-                <tr class="highlighted-row">
-                    <th>Summe</th>
-                    {% for sum_value in account_sums %}
-                        <td>
-                            {% if sum_value != 0 %}
-                                {{ sum_value|floatformat:2 }} €
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-                    <td>–</td>
-                </tr>
-            {% endif %}
-            </tbody>
-        </table>
+                {% if not request.GET.collection %}
+                    <tr class="highlighted-row">
+                        <th>Summe</th>
+                        {% for sum_value in account_sums %}
+                            <td>
+                                {% if sum_value != 0 %}
+                                    {{ sum_value|floatformat:0 }} €
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td>–</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
 
         {% if not request.GET.collection and perms.core.add_collection %}
             <button id="openModal">+ Neues Konto/Kasse</button>

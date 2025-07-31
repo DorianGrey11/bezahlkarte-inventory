@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.timezone import now
 from django.views import View
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.db import transaction as db_transaction
 from django.contrib import messages
 from guardian.shortcuts import get_objects_for_user
@@ -63,13 +63,15 @@ class CollectionBalanceView(LoginRequiredMixin, View):
                 for acc in non_cash_accounts:
                     try:
                         desired_balance = float(request.POST.get(f"account_{acc.id}"))
+                        desired_number_of_gift_cards = int(request.POST.get(f"account_{acc.id}_number_of_gift_cards"))
                     except (TypeError, ValueError):
                         continue
 
                     delta = desired_balance - acc.balance
+                    delta_gift_cards = desired_number_of_gift_cards - acc.number_of_gift_cards
 
-                    if delta != 0:
-                        make_transaction(acc, cash_account, delta, request.user,
+                    if delta != 0 or delta_gift_cards != 0:
+                        make_transaction(acc, cash_account, delta, delta_gift_cards, request.user,
                                          request.POST.get(f"transaction_description"))
 
                 desired_balance = float(request.POST.get(f"account_{cash_account.id}"))
@@ -77,8 +79,13 @@ class CollectionBalanceView(LoginRequiredMixin, View):
                 if abs(balance_mismatch) > 0.01:
                     if request.POST.get('correction'):
                         correction_account = Account.objects.get(name="Fehlbetrag")
-                        make_transaction(cash_account, correction_account, balance_mismatch, request.user,
-                                         request.POST.get(f"transaction_description"))
+                        make_transaction(cash_account,
+                                         correction_account,
+                                         delta_gift_cards,
+                                         balance_mismatch,
+                                         request.user,
+                                         request.POST.get(f"transaction_description")
+                                         )
                     else:
                         raise ValueError("Bilanz fehlerhaft.")
 

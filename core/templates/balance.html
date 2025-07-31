@@ -1,110 +1,132 @@
 {% extends "base.html" %}
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="/">Home</a> &rsaquo;
-    <a href="/?collection={{ collection.id }}">{{ collection.name }}</a> &rsaquo;
-    <a href="/collections/{{ collection.id }}/edit">bearbeiten</a> &rsaquo;
-</div>
+    <div class="breadcrumbs">
+        <a href="/">Home</a> &rsaquo;
+        <a href="/?collection={{ collection.id }}">{{ collection.name }}</a> &rsaquo;
+        <a href="/collections/{{ collection.id }}/edit">bearbeiten</a> &rsaquo;
+    </div>
 {% endblock %}
 
 {% block content %}
-<h1>Bestand aktualisieren für {{ collection.name }}</h1>
+    <h1>Bestand aktualisieren für {{ collection.name }}</h1>
 
-<form method="post" class="update-form">
-    {% csrf_token %}
+    <form method="post" class="update-form">
+        {% csrf_token %}
+        <div class="scroll-container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Konto</th>
+                    {% for account in accounts %}
+                        <th>{{ account.name }}</th>
+                    {% endfor %}
+                    <th>
+                        {% if perms.core.add_account %}
+                            <button type="button" onclick="openModal('giftCardModal')" class="add-gift-card-button">
+                                ➕ Neue Gutscheinart hinzufügen
+                            </button>
+                        {% endif %}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>Aktuelle Gutscheinanzahl</th>
+                    {% for account in accounts %}
+                        <td>{{ account.number_of_gift_cards }} Stück</td>
+                    {% endfor %}
+                    <td></td>
+                </tr>
+                <tr class="bottom-line">
+                    <th>Neue Gutscheinanzahl</th>
+                    {% for account in accounts %}
+                        <td>
+                            <input type="number" step="1" name="account_{{ account.id }}_number_of_gift_cards"
+                                   value="{{ account.number_of_gift_cards }}">
+                        </td>
+                    {% endfor %}
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Aktueller Gesamtwert</th>
+                    {% for account in accounts %}
+                        <td>{{ account.balance }} €</td>
+                    {% endfor %}
+                    <td></td>
+                </tr>
+                <tr class="bottom-line">
+                    <th>Neuer Gesamtwert</th>
+                    {% for account in accounts %}
+                        <td>
+                            <input type="number" step="5" name="account_{{ account.id }}" value="{{ account.balance }}">
+                        </td>
+                    {% endfor %}
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Transaktionsbeschreibung</th>
+                    <td>
+                        <input type="text" id="transaction_description" name="transaction_description"
+                               value="Gutscheintausch am {{ now|date:'d.m.Y' }}">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        {% if balance_mismatch %}
+            <div class="alert">
+                <p><strong>⚠️ Warnung:</strong> Der Saldo wich um <strong>{{ balance_mismatch|floatformat:2 }}
+                    €</strong> ab.
+                </p>
+                <p>Bitte überprüfe die Eingaben. Alternativ kannst du den Fehlbetrag automatisch auf das
+                    Fehlbetragskonto
+                    buchen.</p>
+                <input type="checkbox" name="correction" value="true" id="correction">
+                <label for="correction">Fehlbetrag auf das Fehlbetrag-Konto buchen</label>
+            </div>
+        {% endif %}
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Konto</th>
-            {% for account in accounts %}
-            <th>{{ account.name }}</th>
-            {% endfor %}
-            <th>
-                {% if perms.core.add_account %}
-                <button type="button" onclick="openModal('giftCardModal')" class="add-gift-card-button">
-                    ➕ Neue Gutscheinart hinzufügen
+        <button type="submit">
+            💾 Neuen Bestand speichern
+        </button>
+        <br/>
+    </form>
+
+
+    <!-- Gift Card Modal -->
+    <div id="giftCardModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('giftCardModal')">&times;</span>
+            <h3>Neue Gutscheinart hinzufügen</h3>
+            <form method="post">
+                {% csrf_token %}
+                <label for="add_account_name">Gutscheinname:</label>
+                <input type="text" id="add_account_name" name="add_account_name" value="Gutschein">
+                <button type="submit" name="add_account">
+                    ➕ hinzufügen
                 </button>
-                {% endif %}
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th>Aktueller Bestand</th>
-            {% for account in accounts %}
-            <td>{{ account.balance }} €</td>
-            {% endfor %}
-            <td></td>
-        </tr>
-        <tr>
-            <th>Neuer Bestand</th>
-            {% for account in accounts %}
-            <td>
-                <input type="number" step="0.01" name="account_{{ account.id }}" value="{{ account.balance }}">
-            </td>
-            {% endfor %}
-            <td></td>
-        </tr>
-        <tr>
-            <th>Transaktionsbeschreibung</th>
-            <td>
-                <input type="text" id="transaction_description" name="transaction_description"
-                       value="Gutscheintausch am {{ now|date:'d.m.Y' }}">
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    {% if balance_mismatch %}
-    <div class="alert">
-        <p><strong>⚠️ Warnung:</strong> Der Saldo wich um <strong>{{ balance_mismatch|floatformat:2 }} €</strong> ab.
-        </p>
-        <p>Bitte überprüfe die Eingaben. Alternativ kannst du den Fehlbetrag automatisch auf das Fehlbetragskonto
-            buchen.</p>
-        <input type="checkbox" name="correction" value="true" id="correction">
-        <label for="correction">Fehlbetrag auf das Fehlbetrag-Konto buchen</label>
+            </form>
+        </div>
     </div>
-    {% endif %}
 
-    <button type="submit">
-        💾 Neuen Bestand speichern
-    </button>
-    <br/>
-</form>
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = "block";
+        }
 
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
 
-<!-- Gift Card Modal -->
-<div id="giftCardModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('giftCardModal')">&times;</span>
-        <h3>Neue Gutscheinart hinzufügen</h3>
-        <form method="post">
-            {% csrf_token %}
-            <label for="add_account_name">Gutscheinname:</label>
-            <input type="text" id="add_account_name" name="add_account_name" value="Gutschein">
-            <button type="submit" name="add_account">
-                ➕ hinzufügen
-            </button>
-        </form>
-    </div>
-</div>
-
-<script>
-    function openModal(id) {
-        document.getElementById(id).style.display = "block";
-    }
-    function closeModal(id) {
-        document.getElementById(id).style.display = "none";
-    }
-    window.onclick = function(event) {
-        ["giftCardModal"].forEach(id => {
-            const modal = document.getElementById(id);
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        });
-    };
-</script>
+        window.onclick = function (event) {
+            ["giftCardModal"].forEach(id => {
+                const modal = document.getElementById(id);
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        };
+    </script>
 {% endblock %}
 
 

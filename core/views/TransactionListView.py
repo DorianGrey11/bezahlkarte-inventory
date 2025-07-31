@@ -8,16 +8,19 @@ from ..models import Transaction, Collection
 
 class TransactionTable(tables.Table):
     account = tables.Column(verbose_name="Konto", orderable=True)
-    amount = tables.Column(verbose_name="Betrag", orderable=True)
+    amount = tables.Column(verbose_name="Betrag (€)", orderable=True)
+    number_of_gift_cards = tables.Column(verbose_name="Gutscheine", orderable=True)
     to = tables.Column(verbose_name="Von / An", orderable=True)
     new_balance = tables.Column(verbose_name="Neuer Kontostand", orderable=True)
+    new_number_of_gift_cards = tables.Column(verbose_name="Neue Gutscheinanzahl", orderable=True)
     user = tables.Column(verbose_name="User", orderable=True)
     description = tables.Column(verbose_name="Beschreibung", orderable=True)
     created_at = tables.Column(verbose_name="Zeitpunkt (UTC)", orderable=True)
 
     class Meta:
         model = Transaction
-        fields = ("account", "amount", "to", "new_balance", "user", "description", "created_at")
+        fields = ("account", "amount", "number_of_gift_cards", "to", "new_balance", "new_number_of_gift_cards", "user",
+                  "description", "created_at")
 
 
 class TransactionListView(LoginRequiredMixin, TemplateView):

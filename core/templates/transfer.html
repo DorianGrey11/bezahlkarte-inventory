@@ -1,63 +1,73 @@
 {% extends "base.html" %}
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="/">Home</a> &rsaquo;
-    <a href="/?collection={{ collection.id }}"> {{ collection.name }}</a> &rsaquo;
-    <a href="/collections/{{ collection.id }}/transfer"> transfer </a> &rsaquo;
-</div>
+    <div class="breadcrumbs">
+        <a href="/">Home</a> &rsaquo;
+        <a href="/?collection={{ collection.id }}"> {{ collection.name }}</a> &rsaquo;
+        <a href="/collections/{{ collection.id }}/transfer"> transfer </a> &rsaquo;
+    </div>
 {% endblock %}
 {% block content %}
 
-<form method="post">
-    {% csrf_token %}
-    <h2>Transfer von {{ collection.name }} auf andere Konten/Kassen</h2>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Konto</th>
-            {% for account in accounts %}
-            <th>{{ account.name }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tr>
-            <th><strong>Aktueller Bestand</strong></th>
-            {% for account in accounts %}
-            <td>{{ account.balance }} €</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Zielkonto</th>
-            {% for account in accounts %}
-            <td>
-                <select name="transfer_target_{{ account.id }}">
-                    <option value="">—</option>
-                    {% for target in external_accounts %}
-                        {% if account.name == target.name %}
-                            <option value="{{ target.id }}">{{ target.collection.name }} – {{ target.name }}</option>
-                        {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <h2>Transfer von {{ collection.name }} auf andere Konten/Kassen</h2>
+        <div class="scroll-container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Konto</th>
+                    {% for account in accounts %}
+                        <th>{{ account.name }}</th>
                     {% endfor %}
-                </select>
-            </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Transfer-Betrag</th>
-            {% for account in accounts %}
-            <td>
-                <input type="number" step="0.01" name="transfer_amount_{{ account.id }}">
-            </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <th>Transfer-Beschreibung</th>
-            <td>
-                <input type="text" id="transaction_description" name="transaction_description" size=50
-                       value="Gutscheintausch am {{ now|date:'d.m.Y' }}">
-            </td>
-        </tr>
-    </table>
-
-    <button type="submit">Transfer durchführen</button>
-</form>
+                </tr>
+                </thead>
+                <tr>
+                    <th><strong>Aktueller Bestand</strong></th>
+                    {% for account in accounts %}
+                        <td>{{ account.balance }} €</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Zielkonto</th>
+                    {% for account in accounts %}
+                        <td>
+                            <select name="transfer_target_{{ account.id }}">
+                                <option value="">—</option>
+                                {% for target in external_accounts %}
+                                    {% if account.name == target.name %}
+                                        <option value="{{ target.id }}">{{ target.collection.name }}
+                                            – {{ target.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Transfer-Betrag</th>
+                    {% for account in accounts %}
+                        <td>
+                            <input type="number" step="5" name="transfer_amount_{{ account.id }}">
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Transfer-Gutscheinanzahl</th>
+                    {% for account in accounts %}
+                        <td>
+                            <input type="number" step="1" name="transfer_number_of_gift_cards_{{ account.id }}">
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Transfer-Beschreibung</th>
+                    <td>
+                        <input type="text" id="transaction_description" name="transaction_description" size=50
+                               value="Gutscheintausch am {{ now|date:'d.m.Y' }}">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <button type="submit">Transfer durchführen</button>
+    </form>
 {% endblock %}
