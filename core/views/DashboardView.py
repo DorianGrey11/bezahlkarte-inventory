@@ -52,6 +52,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         rows = []
         account_sums = [0 for _ in account_names]
+        account_gift_cards = [0 for _ in account_names]
         for collection in collections:
             accounts_in_collection = {acc.name: acc for acc in collection.accounts.all()}
             row = {
@@ -64,14 +65,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     for name in account_names
                 ],
             }
+            rows.append(row)
+
             for idx, balance in enumerate(row["balances"]):
                 if balance[1] is not None:
                     account_sums[idx] += balance[1]
-            rows.append(row)
+                if balance[2] is not None:
+                    account_gift_cards[idx] += balance[2]
 
         context.update({
             'account_headers': account_names,
-            'account_sums': account_sums,
+            'account_sums': zip(account_sums, account_gift_cards),
             'rows': rows,
             'transaction_table': TransactionTable(
                 Transaction

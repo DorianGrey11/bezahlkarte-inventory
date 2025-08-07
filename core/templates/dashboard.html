@@ -60,10 +60,13 @@
                 {% if not request.GET.collection %}
                     <tr class="highlighted-row">
                         <th>Summe</th>
-                        {% for sum_value in account_sums %}
+                        {% for sum_value, number_of_gift_cards in account_sums %}
                             <td>
                                 {% if sum_value != 0 %}
                                     {{ sum_value|floatformat:0 }} €
+                                    {% if number_of_gift_cards is not None and number_of_gift_cards != 0 %}
+                                        ({{ number_of_gift_cards }} St.)
+                                    {% endif %}
                                 {% else %}
                                     —
                                 {% endif %}

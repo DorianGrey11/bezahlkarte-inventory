@@ -38,6 +38,8 @@ class Account(models.Model):
     @property
     def number_of_gift_cards(self):
         """Returns the most recent new_number_of_gift_cards recorded for this account"""
+        if self.type == "cash":
+            return 0
         latest_transaction = self.transactions.order_by('-created_at').first()
         return latest_transaction.new_number_of_gift_cards if latest_transaction else 0
 
