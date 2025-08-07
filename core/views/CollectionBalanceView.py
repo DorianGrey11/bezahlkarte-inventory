@@ -81,10 +81,10 @@ class CollectionBalanceView(LoginRequiredMixin, View):
                         correction_account = Account.objects.get(name="Fehlbetrag")
                         make_transaction(cash_account,
                                          correction_account,
-                                         delta_gift_cards,
                                          balance_mismatch,
+                                         0,
                                          request.user,
-                                         request.POST.get(f"transaction_description")
+                                         "Fehlbetrag " + request.POST.get(f"transaction_description")
                                          )
                     else:
                         raise ValueError("Bilanz fehlerhaft.")
