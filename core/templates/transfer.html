@@ -55,7 +55,7 @@
                     <th>Transfer-Gutscheinanzahl</th>
                     {% for account in accounts %}
                         <td>
-                            <input type="number" step="0.01" name="transfer_number_of_gift_cards_{{ account.id }}">
+                            <input type="number" step="1" name="transfer_number_of_gift_cards_{{ account.id }}">
                         </td>
                     {% endfor %}
                 </tr>
