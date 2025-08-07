@@ -41,7 +41,7 @@
                     <th>Neue Gutscheinanzahl</th>
                     {% for account in accounts %}
                         <td>
-                            <input type="number" step="1" name="account_{{ account.id }}_number_of_gift_cards"
+                            <input type="number" step="0.01" name="account_{{ account.id }}_number_of_gift_cards"
                                    value="{{ account.number_of_gift_cards }}">
                         </td>
                     {% endfor %}
@@ -58,7 +58,7 @@
                     <th>Neuer Gesamtwert</th>
                     {% for account in accounts %}
                         <td>
-                            <input type="number" step="5" name="account_{{ account.id }}" value="{{ account.balance }}">
+                            <input type="number" step="0.01" name="account_{{ account.id }}" value="{{ account.balance }}">
                         </td>
                     {% endfor %}
                     <td></td>
