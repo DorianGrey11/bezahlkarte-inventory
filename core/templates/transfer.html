@@ -34,7 +34,7 @@
                             <select name="transfer_target_{{ account.id }}">
                                 <option value="">—</option>
                                 {% for target in external_accounts %}
-                                    {% if account.name == target.name or account.type == "cash" and target.type == "cash" %}
+                                    {% if account.name == target.name or account.type == "cash" and target.type == "cash" or target.type == "administrative"%}
                                         <option value="{{ target.id }}">{{ target.collection.name }}
                                             – {{ target.name }}</option>
                                     {% endif %}
