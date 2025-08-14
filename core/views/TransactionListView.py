@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 from django_tables2 import tables
 from guardian.shortcuts import get_objects_for_user
@@ -27,6 +28,8 @@ class TransactionListView(LoginRequiredMixin, TemplateView):
     template_name = "transaction_list.html"
 
     def get_context_data(self, **kwargs):
+        if not self.request.user.has_perm('core.view_transaction'):
+            raise PermissionDenied("Keine Berechtigung, Transaktionen zu sehen")
         allowed_collections = get_objects_for_user(
             self.request.user,
             'core.view_collection',

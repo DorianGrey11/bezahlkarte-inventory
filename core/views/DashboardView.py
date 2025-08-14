@@ -82,6 +82,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 .objects
                 .filter(account__collection__in=collections)
                 .order_by("-created_at")[:NUMBER_OF_TRANSACTIONS_LISTED:1],
-                order_by=self.request.GET.get("sort")),
+                order_by=self.request.GET.get("sort"))
+            if self.request.user.has_perm('core.view_transaction') else None,
         })
         return context

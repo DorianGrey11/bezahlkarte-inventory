@@ -104,16 +104,18 @@
         {% endif %}
     </section>
 
-    <section>
-        <h2>Letzte Transaktionen</h2>
-        {% load render_table from django_tables2 %}
-        <div>
-            {% render_table transaction_table %}
-        </div>
-        <br/><br/>
-        <a href="/transactions/{% if request.GET.collection %}?collection={% for row in rows %}{{ row.collection.name }}{% endfor %}{% endif %}"
-           class="button">Alle Transaktionen</a>
-    </section>
+    {% if transaction_table is not None %}
+        <section>
+            <h2>Letzte Transaktionen</h2>
+            {% load render_table from django_tables2 %}
+            <div>
+                {% render_table transaction_table %}
+            </div>
+            <br/><br/>
+            <a href="/transactions/{% if request.GET.collection %}?collection={% for row in rows %}{{ row.collection.name }}{% endfor %}{% endif %}"
+               class="button">Alle Transaktionen</a>
+        </section>
+    {% endif %}
 
     <script>
         const modal = document.getElementById("collectionModal");

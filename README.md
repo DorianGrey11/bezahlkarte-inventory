@@ -31,7 +31,8 @@ Folgende Berechtigungen können gesetzt werden:
 - `core.add_account`: Erlaubt Hinzufügen von neuen Gutscheinarten.
 - `core.add_collection`: Erlaubt das Hinzufügen von neuen Kassen/Konten.
 - `core.change_collection`: Erlaubt das Bearbeiten und den Transfer von allen Kassen/Konten.
-- `core.view_collection`: Erlaubt das Ansehen der Kassen/Konten und deren Transactions.
+- `core.view_collection`: Erlaubt das Ansehen der Kassen/Konten.
+- `core.view_transaction`: Erlaubt das Ansehen der Transactions zu den Kassen/Konten für die Berechtigungen bestehen.
 
 Es bietet sich an eine Gruppe zu erstellen, die alle Berechtigungen hat, und diese dann den Usern zuzuweisen.
 
