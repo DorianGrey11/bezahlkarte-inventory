@@ -45,7 +45,9 @@
                         {% endfor %}
                         <td>
                             <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
-                            <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                            {% if perms.core.change_collection %}
+                                <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                            {% endif %}
                             {% if request.GET.collection %}
                                 <a href="/">🔍 Alle Anzeigen</a>
                             {% else %}

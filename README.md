@@ -30,8 +30,8 @@ Falls es immer noch zu einem Fehlbetrag kommt, kann dieser nach Bestätigen der 
 Folgende Berechtigungen können gesetzt werden:
 - `core.add_account`: Erlaubt Hinzufügen von neuen Gutscheinarten.
 - `core.add_collection`: Erlaubt das Hinzufügen von neuen Kassen/Konten.
-- `core.change_collection`: Erlaubt das Hinzufügen von Konten.
-- `core.view_collection`: Erlaubt das Hinzufügen von Transaktionen.
+- `core.change_collection`: Erlaubt das Bearbeiten und den Transfer von allen Kassen/Konten.
+- `core.view_collection`: Erlaubt das Ansehen der Kassen/Konten und deren Transactions.
 
 Es bietet sich an eine Gruppe zu erstellen, die alle Berechtigungen hat, und diese dann den Usern zuzuweisen.
 
