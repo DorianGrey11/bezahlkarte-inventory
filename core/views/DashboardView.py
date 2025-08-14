@@ -44,11 +44,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         try:
             selected_collection_id = self.request.GET.get("collection")
             collections = [collections.get(id=selected_collection_id)]
-            account_names = list(
-                Account.objects.filter(collection=selected_collection_id).values_list("name", flat=True).distinct())
         except Collection.DoesNotExist:
-            collections = collections
-            account_names = list(Account.objects.order_by("type").reverse().values_list("name", flat=True).distinct())
+            pass
+        account_names = list(
+            Account.objects.filter(collection__in=collections).order_by("-type", "name").values_list("name",
+                                                                                                     flat=True).distinct())
 
         rows = []
         account_sums = [0 for _ in account_names]

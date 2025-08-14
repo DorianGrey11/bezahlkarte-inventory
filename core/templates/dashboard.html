@@ -44,20 +44,22 @@
                             </td>
                         {% endfor %}
                         <td>
-                            <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a> |
+                            <a href="{% url 'collection_balance' row.collection.id %}">⚙️Bearbeiten</a>
                             {% if perms.core.change_collection %}
-                                <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a> |
+                                | <a href="{% url 'transfer' row.collection.id %}"> 💸Transfer</a>
                             {% endif %}
-                            {% if request.GET.collection %}
-                                <a href="/">🔍 Alle Anzeigen</a>
-                            {% else %}
-                                <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
+                            {% if rows|length > 1 %}
+                                {% if request.GET.collection %}
+                                    | <a href="/">🔍 Alle Anzeigen</a>
+                                {% else %}
+                                    | <a href="?collection={{ row.collection.id }}">🔍Anzeigen</a>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
 
-                {% if not request.GET.collection %}
+                {% if not request.GET.collection and rows|length > 1 %}
                     <tr class="highlighted-row">
                         <th>Summe</th>
                         {% for sum_value, number_of_gift_cards in account_sums %}
