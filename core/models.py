@@ -9,6 +9,7 @@ User = get_user_model()
 
 class Collection(models.Model):
     name = models.CharField(max_length=100)
+    show_in_api = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

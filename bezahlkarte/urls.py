@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from core.views import CollectionBalanceView, DashboardView, TransferView, TransactionListView
+from core.views import CollectionBalanceView, DashboardView, TransferView, TransactionListView, ApiInventoryView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +26,5 @@ urlpatterns = [
     path('collections/<int:collection_id>/edit/', CollectionBalanceView.as_view(), name='collection_balance'),
     path('collections/<int:collection_id>/transfer/', TransferView.as_view(), name='transfer'),
     path('transactions/', TransactionListView.as_view(), name='transaction_list'),
+    path('api/inventory', ApiInventoryView.as_view(), name='api_inventory'),
 ]
