@@ -21,4 +21,6 @@ class ApiInventoryView(View):
                 "updated_at": collection.updated_at,
             } for collection in collections
         }
-        return JsonResponse(inventory)
+        response = JsonResponse(inventory)
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
