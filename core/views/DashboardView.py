@@ -23,6 +23,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             with transaction.atomic():
                 collection = Collection.objects.create(
                     name=request.POST.get(f"add_collection_name"),
+                    show_in_api=request.POST.get(f"add_collection_show_in_api") == "on",
                 )
                 Account.objects.create(collection=collection, name="Bargeld", type="cash")
                 if request.POST.get(f"add_collection_standard_gift_cards"):
